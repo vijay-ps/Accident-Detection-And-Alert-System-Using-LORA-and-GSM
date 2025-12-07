@@ -54,26 +54,6 @@ Detects jerks, turns, falls, and crashes — then broadcasts alerts to **all LoR
 
 ---
 
-## 🧩 Hardware Block Diagram
-
-    ┌────────────┐
-    │  MPU6050   │
-    └──────┬─────┘
-           │ I2C
-           ▼
-    ┌────────────┐
-    │  ESP32-S2   │
-    └──────┬─────┘
- ┌────────┼─────────┬──────────┐
- │        │         │          │
- ▼        ▼         ▼          ▼
-LoRa     GPS      WiFi AP    (Optional)
-SX1278  Neo-6M    Web UI     SIM800L
-
-Broadcast Accident Data → Receivers
-
----
-
 ## 🔧 Hardware Components
 
 - **ESP32-S2 DevKitM-1** (processing + WiFi AP)  
@@ -203,3 +183,4 @@ Broadcast Accident Data → Receivers
 Made with ❤️ by **PS Vijay** using ESP32 + LoRa + Embedded Systems.
 
 ---
+
