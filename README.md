@@ -174,13 +174,8 @@ Detects jerks, turns, falls, and crashes — then broadcasts alerts to **all LoR
 - 📞 SIM800L SMS Alerting  
 - ☁️ Cloud dashboard (MQTT + WebSocket + Maps)  
 - 🔐 AES-encrypted LoRa packets  
-- 📱 Android/iOS app for notifications  
 - 📊 Crash analytics & logging (SD card or cloud)
 
 ---
 
-## ❤️ Credits
-Made with ❤️ by **PS Vijay** using ESP32 + LoRa + Embedded Systems.
-
----
 
