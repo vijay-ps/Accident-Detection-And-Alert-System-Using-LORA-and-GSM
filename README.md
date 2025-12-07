@@ -1,111 +1,205 @@
-<div style="
-    font-family: Arial, sans-serif;
-    padding: 25px;
-    border-radius: 18px;
-    border: 1px solid #e5e5e5;
-    background: #fafafa;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-">
+# 🚗 Accident Detection & LoRa Emergency Alert System  
+### ESP32-S2 • MPU6050 • GPS Neo-6M • LoRa SX1278 (433 MHz)
 
-    <h1 style="text-align:center; color:#2c3e50;">🚗 Accident Detection & LoRa Alert System</h1>
+A real-time **Accident Detection & Alert System** designed using ESP32-S2, MPU6050, GPS, and LoRa.  
+Detects jerks, turns, falls, and crashes — then broadcasts alerts to **all LoRa receivers in range**.
 
-    <p style="font-size:16px; line-height:1.6; color:#444;">
-        A real-time <b>Accident Detection System</b> using <b>ESP32-S2, MPU6050, GPS Neo-6M, and LoRa (433 MHz)</b>.
-        The system detects motion anomalies, falls, crashes, and broadcasts emergency alerts to all receivers in range.
-    </p>
+---
 
-    <hr style="margin:25px 0;">
+## 📌 System Overview (ASCII Diagram)
 
-    <h2 style="color:#34495e;">✨ Features</h2>
-    <ul style="font-size:15px; line-height:1.6;">
-        <li><b>5-Level Motion & Accident Detection</b></li>
-        <li><b>LoRa Broadcast Mode</b> — any receiver gets alerts</li>
-        <li><b>GPS Google Maps Location</b> auto-included</li>
-        <li><b>WiFi AP Web UI</b> to set Car Number</li>
-        <li><b>JSON Formatted LoRa Payload</b></li>
-        <li>Fallback location when GPS signal is weak</li>
-    </ul>
+    ┌─────────────────────────────────────────┐
+    │              VEHICLE UNIT               │
+    │               (SENDER)                  │
+    ├─────────────────────────────────────────┤
+    │                                         │
+    │   MPU6050 → Motion / Impact Detection   │
+    │   GPS Neo-6M → Location Coordinates     │
+    │   ESP32-S2 → Processing & Web Config    │
+    │   LoRa SX1278 → Broadcast Accident Msg  │
+    │                                         │
+    └─────────────────────────────────────────┘
+                        │
+                        │ LoRa Broadcast (433 MHz)
+                        ▼
+    ┌─────────────────────────────────────────┐
+    │               RECEIVER UNIT             │
+    │             (ANY LoRa DEVICE)           │
+    ├─────────────────────────────────────────┤
+    │ Displays data, Alerts, Optional Buzzer  │
+    └─────────────────────────────────────────┘
 
-    <hr style="margin:25px 0;">
+---
 
-    <h2 style="color:#34495e;">🧪 Detection Levels</h2>
-    <table style="width:100%; border-collapse:collapse; font-size:15px;">
-        <tr style="background:#2c3e50; color:white;">
-            <th style="padding:10px;">Level</th>
-            <th>Description</th>
-        </tr>
-        <tr><td style="padding:8px;">1️⃣</td><td>Slight Jerk</td></tr>
-        <tr style="background:#f2f2f2;"><td style="padding:8px;">2️⃣</td><td>Speed Breaker</td></tr>
-        <tr><td style="padding:8px;">3️⃣</td><td>Sharp Turn</td></tr>
-        <tr style="background:#f2f2f2;"><td style="padding:8px;">4️⃣</td><td>Vehicle Fall / Rollover</td></tr>
-        <tr><td style="padding:8px;">5️⃣</td><td><b style="color:#e74c3c;">Accident / Crash (Broadcast Trigger)</b></td></tr>
-    </table>
+## ✨ Features
 
-    <hr style="margin:25px 0;">
+- 🚦 **5-Level Real-Time Accident Detection**
+- 📡 **LoRa Broadcast Mode** (any receiver can read)
+- 🛰 **GPS Google Maps Location** auto-attached
+- 🌐 **WiFi AP Webpage** to set Car Number
+- 📑 **JSON Powered Message Format**
+- 🔁 Debounce & false-positive filtering
 
-    <h2 style="color:#34495e;">🔧 Hardware</h2>
-    <ul style="font-size:15px; line-height:1.6;">
-        <li><b>ESP32-S2 DevKitM-1</b> (Main Controller)</li>
-        <li><b>MPU6050</b> (Motion Sensor)</li>
-        <li><b>GPS Neo-6M</b></li>
-        <li><b>LoRa SX1278 (433 MHz)</b></li>
-        <li>Optional: SIM800L (future SMS version)</li>
-    </ul>
+---
 
-    <hr style="margin:25px 0;">
+## 🧭 5-Level Detection Table
 
-    <h2 style="color:#34495e;">📡 LoRa JSON Broadcast Payload</h2>
-    <pre style="
-        background:#272822;
-        color:#e6e6e6;
-        padding:15px;
-        border-radius:10px;
-        font-size:14px;
-        overflow-x:auto;
-    ">
-{
-  "car": "TN22AB1234",
-  "level": 5,
-  "type": "ACCIDENT",
-  "acc": 28.52,
-  "loc": "https://maps.google.com/?q=12.8423,80.1566"
-}
-    </pre>
+| Level | Condition | Meaning |
+|-------|-----------|---------|
+| 1️⃣ | Slight Jerk | Small disturbance |
+| 2️⃣ | Speed Breaker | Moderate bump |
+| 3️⃣ | Sharp Turn | Hard turn detection |
+| 4️⃣ | Fall / Rollover | Risky tilt / vehicle fall |
+| 5️⃣ | 🚨 Accident / Crash | Severe impact → Broadcast Trigger |
 
-    <hr style="margin:25px 0;">
+---
 
-    <h2 style="color:#34495e;">🧭 WiFi Setup Page</h2>
-    <p style="font-size:15px; line-height:1.6;">
-        Connect to WiFi hotspot:
-        <br><b>SSID:</b> ESP32-CarSetup  
-        <br><b>Password:</b> 12345678
-        <br>Open <b>http://192.168.4.1</b> → Enter Car Number → Save.
-    </p>
+## 🧩 Hardware Block Diagram
 
-    <hr style="margin:25px 0;">
+    ┌────────────┐
+    │  MPU6050   │
+    └──────┬─────┘
+           │ I2C
+           ▼
+    ┌────────────┐
+    │  ESP32-S2   │
+    └──────┬─────┘
+ ┌────────┼─────────┬──────────┐
+ │        │         │          │
+ ▼        ▼         ▼          ▼
+LoRa     GPS      WiFi AP    (Optional)
+SX1278  Neo-6M    Web UI     SIM800L
 
-    <h2 style="color:#34495e;">📁 Project Structure</h2>
-    <pre style="
-        background:#272822;
-        color:#e6e6e6;
-        padding:15px;
-        border-radius:10px;
-        font-size:14px;
-        overflow-x:auto;
-    ">
-📦 AccidentDetection-LoRa
-│
-├── sender/
-│   └── sender.ino
-│
-├── receiver/
-│   └── receiver.ino
-│
-└── README.md
-    </pre>
+Broadcast Accident Data → Receivers
 
-    <hr style="margin:25px 0;">
+---
 
-    <h2 style="text-align:center; color:#2c3e50;">Made with ❤️ using ESP32 + LoRa</h2>
+## 🔧 Hardware Components
 
-</div>
+- **ESP32-S2 DevKitM-1** (processing + WiFi AP)  
+- **MPU6050** IMU (acceleration + gyro)  
+- **GPS Neo-6M**  
+- **LoRa SX1278 433 MHz**  
+- (Optional) **SIM800L** for SMS extension
+
+---
+
+## 📡 LoRa Broadcast Message (JSON Format)
+
+    {
+      "car": "TN22AB1234",
+      "level": 5,
+      "type": "ACCIDENT",
+      "acc": 29.41,
+      "loc": "https://maps.google.com/?q=12.8423,80.1566"
+    }
+
+---
+
+## 🌐 WiFi Configuration Page (ASCII Flow)
+
+    User Phone/Laptop
+            │
+    Connect to WiFi:
+    SSID: ESP32-CarSetup
+    PASS: 12345678
+            │
+            ▼
+    Open http://192.168.4.1
+            │
+            ▼
+    Enter Car Number → SAVE
+
+---
+
+## 📁 Project Structure
+
+    📦 AccidentDetection-LoRa
+    │
+    ├── sender/
+    │   └── sender.ino        # ESP32-S2 full logic (MPU + GPS + LoRa + WebUI)
+    │
+    ├── receiver/
+    │   └── receiver.ino      # LoRa receiver script
+    │
+    └── README.md             # Project Documentation
+
+---
+
+## ▶️ Sender Overview (ESP32-S2 Logic Flow)
+
+    Start
+      │
+      ├── Load saved car number from Preferences
+      ├── Initialize MPU6050
+      ├── Initialize GPS
+      ├── Initialize LoRa
+      ├── Start WiFi AP (for configuration)
+      │
+    Loop:
+      ├── Read sensors (MPU)
+      ├── Calculate motion magnitude
+      ├── Classify into Levels 1–5
+      ├── If Level 5 & cooldown passed:
+      │      ├── Get GPS / fallback location
+      │      ├── Build JSON message
+      │      └── Broadcast over LoRa
+      │
+      └── Listen for LoRa messages (debug)
+
+---
+
+## ▶️ Receiver Overview
+
+    Start LoRa Receiver
+            │
+    Listen for Packets
+            │
+            ▼
+    If Accident Packet:
+       Print data
+       Show RSSI
+       Optionally trigger buzzer/LED
+
+---
+
+## 🛠 Installation & Flashing
+
+### Sender (ESP32-S2)
+1. Open Arduino IDE  
+2. Select board → **ESP32S2 Dev Module**  
+3. Install libraries:  
+   - Adafruit MPU6050  
+   - TinyGPS++  
+   - LoRa (Sandeep Mistry)  
+4. Flash `sender.ino`
+
+### Receiver
+- Flash `receiver.ino` into any LoRa-capable board
+
+---
+
+## 🚀 Tuning & Testing
+
+1. Calibrate thresholds during stationary test.  
+2. Start with lower sensitivity, monitor false positives.  
+3. Test speed breaker, turns, simulated fall, and crash cases.  
+4. Tune threshold constants in `sender.ino` accordingly.  
+5. Test LoRa broadcast range and RSSI on receiver.
+
+---
+
+## 🚀 Future Extensions
+
+- 📞 SIM800L SMS Alerting  
+- ☁️ Cloud dashboard (MQTT + WebSocket + Maps)  
+- 🔐 AES-encrypted LoRa packets  
+- 📱 Android/iOS app for notifications  
+- 📊 Crash analytics & logging (SD card or cloud)
+
+---
+
+## ❤️ Credits
+Made with ❤️ by **PS Vijay** using ESP32 + LoRa + Embedded Systems.
+
+---
